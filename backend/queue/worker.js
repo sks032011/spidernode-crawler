@@ -8,25 +8,23 @@ const { isAllowedToCrawl } = require('../services/robots');
 const { addUrlToQueue } = require('./producer');
 const { MAX_DEPTH } = require('../config/constants'); 
 
-// 🔥 THE BRAKES: A simple promise that forces JavaScript to wait
+// promise that forces JavaScript to wait
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Connect to MongoDB Atlas before starting the worker
+// Connect to MongoDB  before starting the worker
 connectDB();
 
-// (Cleaned up the duplicate logs)
-console.log('🤖 Worker Node booting up... Waiting for jobs.');
+console.log('Worker Node booting up... Waiting for jobs.');
 
 const crawlerWorker = new Worker('CrawlerQueue', async (job) => {
     const { url, depth } = job.data;
-    console.log(`\n⚙️  Processing [Depth ${depth}]: ${url}`);
+    console.log(`\n  Processing [Depth ${depth}]: ${url}`);
 
-    // 🔥 EVERYTHING is now safely inside one try/catch block
     try {
         // Step 1: Check robots.txt 
         const allowed = await isAllowedToCrawl(url);
         if (!allowed) {
-            console.log(`🚫 Blocked by robots.txt: ${url}`);
+            console.log(`Blocked by robots.txt: ${url}`);
             return { url, title: 'Blocked', linksFound: [] };
         }
 
@@ -35,8 +33,8 @@ const crawlerWorker = new Worker('CrawlerQueue', async (job) => {
 
         // Step 3: Scrape the page
         const pageData = await scrapePage(url);
-        console.log(`✅ Scraped: "${pageData.title}"`);
-        console.log(`🔗 Found ${pageData.linksFound.length} links`);
+        console.log(`Scraped: "${pageData.title}"`);
+        console.log(`Found ${pageData.linksFound.length} links`);
 
         // Step 4: Queue new links if under depth limit
         if (depth < MAX_DEPTH) {
@@ -44,13 +42,13 @@ const crawlerWorker = new Worker('CrawlerQueue', async (job) => {
                 await addUrlToQueue(link, depth + 1);
             }
         } else {
-            console.log(`🛑 Max depth reached. Not going deeper.`);
+            console.log(` Max depth reached. Not going deeper.`);
         }
 
         return pageData;
 
     } catch (error) {
-        console.error(`💥 Worker failed on ${url}:`, error.message);
+        console.error(` Worker failed on ${url}:`, error.message);
         throw error; // Let BullMQ handle the DLQ/Retry logic
     }
 
@@ -59,7 +57,7 @@ const crawlerWorker = new Worker('CrawlerQueue', async (job) => {
     concurrency: 5 // Process 5 URLs simultaneously
 });
 
-// 🔥 The Persistence Layer: Upsert to MongoDB Atlas
+// The Persistence Layer: Upsert to MongoDB 
 crawlerWorker.on('completed', async (job, pageData) => {
     try {
         if (pageData && pageData.title !== 'Blocked') {
@@ -73,13 +71,13 @@ totalLinks: pageData.linksFound?.length ?? 0                },
                 { upsert: true, new: true }      // Execute the Upsert
             );
             
-            console.log(`💾 Upserted to MongoDB: ${pageData.url}`);
+            console.log(` Upserted to MongoDB: ${pageData.url}`);
         }
     } catch (error) {
-        console.error(`❌ MongoDB Save Error:`, error.message);
+        console.error(` MongoDB Save Error:`, error.message);
     }
 });
 
 crawlerWorker.on('failed', (job, err) => {
-    console.error(`❌ Job ${job.id} permanently failed: ${err.message}`);
+    console.error(` Job ${job.id} permanently failed: ${err.message}`);
 });

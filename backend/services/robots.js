@@ -1,4 +1,3 @@
-// backend/services/robots.js
 const axios = require('axios');
 const robotsParser = require('robots-parser');
 
@@ -40,13 +39,13 @@ async function isAllowedToCrawl(targetUrl) {
 
         // ONLY allow if the server explicitly says the file does not exist (404)
         if (error.response && error.response.status === 404) {
-            // 🔥 CRITICAL FIX: Cache the 404 so we don't keep checking for a file that doesn't exist!
+            //Cache the 404 so we don't keep checking for a file that doesn't exist!
             robotsCache.set(host, null); 
             return true; 
         }
         
         // If the network drops or the server 500s, it's safer to abort.
-        console.warn(`⚠️ Network issue fetching robots.txt for ${targetUrl}. Defaulting to block.`);
+        console.warn(`Network issue fetching robots.txt for ${targetUrl}. Defaulting to block.`);
         return false; 
     }
 }

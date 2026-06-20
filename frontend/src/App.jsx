@@ -50,13 +50,13 @@ function App() {
       const data = await res.json();
       
       if (data.success) {
-        setStatusMsg('✅ Crawl Started!');
+        setStatusMsg('Crawl Started!');
         setSeedUrl('');
       } else {
-        setStatusMsg('❌ Error: ' + data.error);
+        setStatusMsg(' Error: ' + data.error);
       }
     } catch (err) {
-      setStatusMsg('❌ Server not responding.');
+      setStatusMsg(' Server not responding.');
     }
     setTimeout(() => setStatusMsg(''), 3000); 
   };
@@ -67,10 +67,10 @@ function App() {
       const res = await fetch('http://localhost:5000/api/stop', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        setStatusMsg('🛑 Crawl Stopped!');
+        setStatusMsg(' Crawl Stopped!');
       }
     } catch (err) {
-      setStatusMsg('❌ Failed to stop.');
+      setStatusMsg('Failed to stop.');
     }
     setTimeout(() => setStatusMsg(''), 3000);
   };
@@ -83,7 +83,7 @@ function App() {
       const res = await fetch('http://localhost:5000/api/reset', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        setStatusMsg('✅ System Wiped Clean');
+        setStatusMsg('System Wiped Clean');
         setMetrics({
           queue: { waiting: 0, active: 0, completed: 0, failed: 0 },
           database: { totalSaved: 0 }
@@ -91,7 +91,7 @@ function App() {
         setRecentPages([]);
       }
     } catch (err) {
-      setStatusMsg('❌ Reset failed.');
+      setStatusMsg('Reset failed.');
     }
     setTimeout(() => setStatusMsg(''), 3000);
   };

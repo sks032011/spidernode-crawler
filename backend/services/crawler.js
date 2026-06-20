@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { USER_AGENT } = require('./robots'); // Import our unified identity
+const { USER_AGENT } = require('./robots'); // Import unified identity
 
 async function scrapePage(targetUrl) {
     try {
@@ -23,7 +23,7 @@ async function scrapePage(targetUrl) {
             try {
                 const urlObj = new URL(href, targetUrl);
 
-                // 🔥 CRITICAL FIX: Do not keep links that lead to other websites
+                // Do not keep links that lead to other websites
                 if (urlObj.host !== baseHost) return;
 
                 // CLEANER URL NORMALIZATION: Strip out the # fragments cleanly
@@ -44,7 +44,7 @@ const cleanUrl = urlObj.href.replace(/\/$/, ''); // Remove trailing slash
         };
 
     } catch (error) {
-        console.error(`❌ Failed to scrape ${targetUrl}: ${error.message}`);
+        console.error(`Failed to scrape ${targetUrl}: ${error.message}`);
         throw error; 
     }
 }
